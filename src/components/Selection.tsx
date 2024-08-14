@@ -12,7 +12,7 @@ export default function Selection({
   generationSelectionFunc: Function;
 }) {
   return (
-    <div className="flex-1 flex justify-around">
+    <div className="flex justify-around mb-8">
       <div>
         <Button
           text="Easy"

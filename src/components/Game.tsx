@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import Selection from "./Selection.tsx";
+import Cards from "./Cards.tsx";
 
 export default function Game() {
   const [tileCount, setTileCount] = useState(10);
@@ -8,20 +9,17 @@ export default function Game() {
 
   // Fetch pokemon species data
   const getPokemonFromGen = async (genId: string) => {
-    try {
-      const pokemonSpecies: Array<Object> = await fetch(
-        `https://pokeapi.co/api/v2/generation/${genId}/`,
-      )
-        .then((data) => data.json())
-        .then((data) => data.pokemon_species);
-      return pokemonSpecies;
-    } catch (err) {
-      console.error(err);
-    }
+    const pokemonSpecies: Array<Object> = await fetch(
+      `https://pokeapi.co/api/v2/generation/${genId}/`,
+    )
+      .then((data) => data.json())
+      .then((data) => data.pokemon_species)
+      .catch((err) => console.error(err));
+    return pokemonSpecies;
   };
 
   const pokemonData = useMemo(() => {
-    const getPokemon = async () => {
+    const getPokemon = async (): Promise<Object[] | null> => {
       const pokemonSpecies = await getPokemonFromGen(generation);
 
       const randSpecies: Object[] = [];
@@ -57,6 +55,7 @@ export default function Game() {
         difficultySelectionFunc={handleDifficultyChange}
         generationSelectionFunc={handleGenerationChange}
       />
+      <Cards cardInfo={pokemonData} />
     </div>
   );
 }
