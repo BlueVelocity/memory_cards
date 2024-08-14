@@ -1,7 +1,23 @@
-export default function Button({ text, quantity, tileCount, clickFunc }: { text: string, quantity: string, tileCount: string, clickFunc: Function }) {
+export default function Button({
+  text,
+  name,
+  styleConfig,
+  selectionCondition,
+  clickFunc,
+}: {
+  text: string;
+  name: string;
+  styleConfig: { textCol: string; bgCol: string; bgColSelected: string };
+  selectionCondition: string;
+  clickFunc: Function;
+}) {
   return (
-    <button name={quantity} className={`px-5 mx-4 rounded font-bold ${quantity == tileCount ? "bg-red-800 text-yellow-400" : "bg-[#f04037]"}`} onClick={(e) => clickFunc(e)}>
+    <button
+      name={name}
+      className={`px-5 mx-4 rounded font-bold ${name == selectionCondition ? `${styleConfig.bgColSelected} ${styleConfig.textCol}` : styleConfig.bgCol}`}
+      onClick={(e) => clickFunc(e)}
+    >
       {text}
     </button>
-  )
+  );
 }
