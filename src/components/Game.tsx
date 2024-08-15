@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import Selection from "./Selection.tsx";
 import Score from "./Score.tsx";
 import Cards from "./Cards.tsx";
@@ -58,6 +58,7 @@ export default function Game() {
     setScore([]);
   };
 
+  //Fisher–Yates (aka Knuth) Shuffle
   const shuffleArray = (arr: Array<any>) => {
     const newArr = arr.slice(0);
 
