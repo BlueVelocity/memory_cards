@@ -2,41 +2,57 @@ import { useState, useEffect, useMemo } from "react";
 import Selection from "./Selection.tsx";
 import Cards from "./Cards.tsx";
 
+interface PokeData {
+  url: string,
+  name: string,
+}
+
 export default function Game() {
   const [tileCount, setTileCount] = useState(10);
   const [generation, setGeneration] = useState("1");
+  const [pokeData, setPokeData] = useState<PokeData[] | null>(null);
   const [tileData, setTileData] = useState();
 
   // Fetch pokemon species data
   const getPokemonFromGen = async (genId: string) => {
-    const pokemonSpecies: Array<Object> = await fetch(
+    const genResponse = await fetch(
       `https://pokeapi.co/api/v2/generation/${genId}/`,
     )
-      .then((data) => data.json())
-      .then((data) => data.pokemon_species)
-      .catch((err) => console.error(err));
-    return pokemonSpecies;
+    const genData = await genResponse.json();
+
+    const pokemonData = genData.pokemon_species.map(async ({ url, name }: { url: string, name: string }) => {
+      const speciesResponse = await fetch(url);
+      const speciesData = await speciesResponse.json();
+
+      const pokemonResponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${speciesData.id.toString()}/`);
+      const pokemonData = await pokemonResponse.json();
+      console.log({ url: pokemonData.sprites.front_default, name: name })
+
+      return { url: pokemonData.sprites.front_default, name: name }
+    })
+
+    return pokemonData;
   };
 
-  const pokemonData = useMemo(() => {
-    const getPokemon = async (): Promise<Object[] | null> => {
-      const pokemonSpecies = await getPokemonFromGen(generation);
+  useEffect(() => {
+    const getPokemon = async () => {
+      const pokemon = await getPokemonFromGen(generation);
 
-      const randSpecies: Object[] = [];
-      if (pokemonSpecies) {
+      const randSpecies: Array<PokeData> = [];
+      if (pokemon) {
         for (let i = 0; i < tileCount; i++) {
-          const randNum = Math.floor(Math.random() * pokemonSpecies.length - 1);
+          const randNum = Math.floor(Math.random() * pokemon.length - 1);
 
-          !randSpecies.includes(pokemonSpecies[randNum])
-            ? randSpecies.push(pokemonSpecies[randNum])
+          !randSpecies.includes(pokemon[randNum])
+            ? randSpecies.push(pokemon[randNum])
             : i--;
         }
       }
 
-      return randSpecies;
+      setPokeData(randSpecies);
     };
 
-    return getPokemon();
+    getPokemon();
   }, [tileCount, generation]);
 
   const handleDifficultyChange = (e: any) => {
@@ -55,7 +71,7 @@ export default function Game() {
         difficultySelectionFunc={handleDifficultyChange}
         generationSelectionFunc={handleGenerationChange}
       />
-      <Cards cardInfo={pokemonData} />
+      <Cards cardInfo={pokeData} />
     </div>
   );
 }
