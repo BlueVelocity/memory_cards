@@ -14,7 +14,7 @@ export default function Button({
   return (
     <button
       name={name}
-      className={`px-5 mx-4 rounded font-bold ${name == selectionCondition ? `${styleConfig.bgColSelected} ${styleConfig.textCol}` : styleConfig.bgCol}`}
+      className={`px-5 mx-4 my-1 rounded font-bold ${name == selectionCondition ? `${styleConfig.bgColSelected} ${styleConfig.textCol}` : styleConfig.bgCol}`}
       onClick={(e) => clickFunc(e)}
     >
       {text}

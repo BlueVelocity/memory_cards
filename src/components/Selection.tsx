@@ -13,7 +13,7 @@ export default function Selection({
 }) {
   return (
     <div className="flex justify-around mb-8">
-      <div>
+      <div className="flex flex-col md:flex-row">
         <Button
           text="Easy"
           name="10"
@@ -48,7 +48,7 @@ export default function Selection({
           selectionCondition={tileCount}
         />
       </div>
-      <div>
+      <div className="flex flex-col md:flex-row">
         <Button
           text="Gen 1"
           name="1"

@@ -62,7 +62,7 @@ export default function Game() {
         difficultySelectionFunc={handleDifficultyChange}
         generationSelectionFunc={handleGenerationChange}
       />
-      <Cards cardInfo={pokeData} />
+      <Cards cardInfo={pokeData} tileCount={tileCount} />
     </div>
   );
 }
