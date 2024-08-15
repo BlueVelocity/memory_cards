@@ -3,57 +3,56 @@ import Selection from "./Selection.tsx";
 import Cards from "./Cards.tsx";
 
 interface PokeData {
-  url: string,
   name: string,
+  url: string,
 }
 
 export default function Game() {
   const [tileCount, setTileCount] = useState(10);
   const [generation, setGeneration] = useState("1");
-  const [pokeData, setPokeData] = useState<PokeData[] | null>(null);
-  const [tileData, setTileData] = useState();
+  const [pokeData, setPokeData] = useState<Array<PokeData>>([]);
+  const [genData, setGenData] = useState<{ [index: string]: any } | null>();
 
-  // Fetch pokemon species data
-  const getPokemonFromGen = async (genId: string) => {
-    const genResponse = await fetch(
-      `https://pokeapi.co/api/v2/generation/${genId}/`,
-    )
-    const genData = await genResponse.json();
+  const getPokemonData = async () => {
+    let tempGenData: { [index: string]: any } | null | undefined = genData;
+    if (!genData) {
+      const gen1Res = await fetch(`https://pokeapi.co/api/v2/generation/1/`);
+      const gen3Res = await fetch(`https://pokeapi.co/api/v2/generation/3/`);
+      const gen5Res = await fetch(`https://pokeapi.co/api/v2/generation/5/`);
+      const gen1Data = await gen1Res.json();
+      const gen3Data = await gen3Res.json();
+      const gen5Data = await gen5Res.json();
 
-    const pokemonData = genData.pokemon_species.map(async ({ url, name }: { url: string, name: string }) => {
-      const speciesResponse = await fetch(url);
-      const speciesData = await speciesResponse.json();
+      setGenData(() => ({ "1": gen1Data, "3": gen3Data, "5": gen5Data }));
+      tempGenData = { "1": gen1Data, "3": gen3Data, "5": gen5Data };
+    }
 
-      const pokemonResponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${speciesData.id.toString()}/`);
-      const pokemonData = await pokemonResponse.json();
-      console.log({ url: pokemonData.sprites.front_default, name: name })
+    // Randomly generate numbers to correspond with pokemon
+    const randNums: Array<number> = [];
+    for (let i = 0; i < 10; i++) {
+      const randNum = Math.floor(Math.random() * (tempGenData![`${generation}`].pokemon_species.length - 1));
+      randNums.includes(randNum) ? i-- : randNums.push(randNum);
+    }
 
-      return { url: pokemonData.sprites.front_default, name: name }
-    })
+    const selectedPokemon: Array<PokeData> = [];
+    const getSelectedPokemon = async () => {
+      for (const num of randNums) {
+        const pokemon = await fetch(`https://pokeapi.co/api/v2/pokemon/${tempGenData ? tempGenData[`${generation}`].pokemon_species[num].name : "1"}/`)
+        const pokemonData = await pokemon.json();
+        const name = pokemonData.name.toUpperCase();
 
-    return pokemonData;
-  };
-
-  useEffect(() => {
-    const getPokemon = async () => {
-      const pokemon = await getPokemonFromGen(generation);
-
-      const randSpecies: Array<PokeData> = [];
-      if (pokemon) {
-        for (let i = 0; i < tileCount; i++) {
-          const randNum = Math.floor(Math.random() * pokemon.length - 1);
-
-          !randSpecies.includes(pokemon[randNum])
-            ? randSpecies.push(pokemon[randNum])
-            : i--;
-        }
+        selectedPokemon.push({ name: name, url: pokemonData.sprites.front_default })
       }
 
-      setPokeData(randSpecies);
-    };
+      setPokeData(selectedPokemon);
+    }
 
-    getPokemon();
-  }, [tileCount, generation]);
+    getSelectedPokemon();
+  }
+
+  useEffect(() => {
+    getPokemonData();
+  }, [generation])
 
   const handleDifficultyChange = (e: any) => {
     setTileCount(Number(e.target.name));
