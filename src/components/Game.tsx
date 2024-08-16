@@ -16,7 +16,7 @@ const genIdRanges: { [index: string]: Array<number> } = {
 }
 
 export default function Game() {
-  const [tileCount, setTileCount] = useState(10);
+  const [tileCount, setTileCount] = useState(15);
   const [generation, setGeneration] = useState("1");
   const [pokeData, setPokeData] = useState<Array<PokeData>>([]);
   const [score, setScore] = useState<Array<number>>([]);
