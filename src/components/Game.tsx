@@ -20,8 +20,10 @@ export default function Game() {
   const [generation, setGeneration] = useState("1");
   const [pokeData, setPokeData] = useState<Array<PokeData>>([]);
   const [score, setScore] = useState<Array<number>>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const getPokemonData = async () => {
+    setLoading(true);
     // Randomly generate numbers to correspond with pokemon
     const randNums: Array<number> = [];
     for (let i = 0; i < tileCount; i++) {
@@ -39,6 +41,7 @@ export default function Game() {
       }
 
       setPokeData(selectedPokemon);
+      setLoading(false);
     }
 
     getSelectedPokemon();
@@ -87,7 +90,7 @@ export default function Game() {
         generationSelectionFunc={handleGenerationChange}
       />
       <Score tileCount={tileCount} score={score} />
-      <Cards cardInfo={pokeData} tileCount={tileCount} clickCard={handleCardSelection} />
+      <Cards cardInfo={pokeData} tileCount={tileCount} loading={loading} clickCard={handleCardSelection} />
     </div>
   );
 }
